@@ -1,202 +1,225 @@
-try {
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var recognition = new SpeechRecognition();
+
+var langs =
+  [['Afrikaans', ['af-ZA']],
+  ['Bahasa Indonesia', ['id-ID']],
+  ['Bahasa Melayu', ['ms-MY']],
+  ['Català', ['ca-ES']],
+  ['Čeština', ['cs-CZ']],
+  ['Deutsch', ['de-DE']],
+  ['English', ['en-AU', 'Australia'],
+    ['en-CA', 'Canada'],
+    ['en-IN', 'India'],
+    ['en-NZ', 'New Zealand'],
+    ['en-ZA', 'South Africa'],
+    ['en-GB', 'United Kingdom'],
+    ['en-US', 'United States']],
+  ['Español', ['es-AR', 'Argentina'],
+    ['es-BO', 'Bolivia'],
+    ['es-CL', 'Chile'],
+    ['es-CO', 'Colombia'],
+    ['es-CR', 'Costa Rica'],
+    ['es-EC', 'Ecuador'],
+    ['es-SV', 'El Salvador'],
+    ['es-ES', 'España'],
+    ['es-US', 'Estados Unidos'],
+    ['es-GT', 'Guatemala'],
+    ['es-HN', 'Honduras'],
+    ['es-MX', 'México'],
+    ['es-NI', 'Nicaragua'],
+    ['es-PA', 'Panamá'],
+    ['es-PY', 'Paraguay'],
+    ['es-PE', 'Perú'],
+    ['es-PR', 'Puerto Rico'],
+    ['es-DO', 'República Dominicana'],
+    ['es-UY', 'Uruguay'],
+    ['es-VE', 'Venezuela']],
+  ['Euskara', ['eu-ES']],
+  ['Français', ['fr-FR']],
+  ['Galego', ['gl-ES']],
+  ['Hrvatski', ['hr_HR']],
+  ['IsiZulu', ['zu-ZA']],
+  ['Íslenska', ['is-IS']],
+  ['Italiano', ['it-IT', 'Italia'],
+    ['it-CH', 'Svizzera']],
+  ['Magyar', ['hu-HU']],
+  ['Nederlands', ['nl-NL']],
+  ['Norsk bokmål', ['nb-NO']],
+  ['Polski', ['pl-PL']],
+  ['Português', ['pt-BR', 'Brasil'],
+    ['pt-PT', 'Portugal']],
+  ['Română', ['ro-RO']],
+  ['Slovenčina', ['sk-SK']],
+  ['Suomi', ['fi-FI']],
+  ['Svenska', ['sv-SE']],
+  ['Türkçe', ['tr-TR']],
+  ['български', ['bg-BG']],
+  ['Pусский', ['ru-RU']],
+  ['Српски', ['sr-RS']],
+  ['한국어', ['ko-KR']],
+  ['中文', ['cmn-Hans-CN', '普通话 (中国大陆)'],
+    ['cmn-Hans-HK', '普通话 (香港)'],
+    ['cmn-Hant-TW', '中文 (台灣)'],
+    ['yue-Hant-HK', '粵語 (香港)']],
+  ['日本語', ['ja-JP']],
+  ['Lingua latīna', ['la']]];
+
+for (var i = 0; i < langs.length; i++) {
+  select_language.options[i] = new Option(langs[i][0], i);
 }
-catch(e) {
-  console.error(e);
-  $('.no-browser-support').show();
-  $('.app').hide();
-}
+select_language.selectedIndex = 6;
+updateCountry();
+select_dialect.selectedIndex = 6;
+showInfo('info_start');
 
-
-var noteTextarea = $('#note-textarea');
-var instructions = $('#recording-instructions');
-var notesList = $('ul#notes');
-
-var noteContent = '';
-
-// Get all notes from previous sessions and display them.
-var notes = getAllNotes();
-renderNotes(notes);
-
-
-
-/*-----------------------------
-      Voice Recognition 
-------------------------------*/
-
-// If false, the recording will stop after a few seconds of silence.
-// When true, the silence period is longer (about 15 seconds),
-// allowing us to keep recording even when the user pauses. 
-recognition.continuous = true;
-
-// This block is called every time the Speech APi captures a line. 
-recognition.onresult = function(event) {
-
-  // event is a SpeechRecognitionEvent object.
-  // It holds all the lines we have captured so far. 
-  // We only need the current one.
-  var current = event.resultIndex;
-
-  // Get a transcript of what was said.
-  var transcript = event.results[current][0].transcript;
-
-  // Add the current transcript to the contents of our Note.
-  // There is a weird bug on mobile, where everything is repeated twice.
-  // There is no official solution so far so we have to handle an edge case.
-  var mobileRepeatBug = (current == 1 && transcript == event.results[0][0].transcript);
-
-  if(!mobileRepeatBug) {
-    noteContent += transcript;
-    noteTextarea.val(noteContent);
+function updateCountry() {
+  for (var i = select_dialect.options.length - 1; i >= 0; i--) {
+    select_dialect.remove(i);
   }
-};
-
-recognition.onstart = function() { 
-  instructions.text('Voice recognition activated. Try speaking into the microphone.');
+  var list = langs[select_language.selectedIndex];
+  for (var i = 1; i < list.length; i++) {
+    select_dialect.options.add(new Option(list[i][1], list[i][0]));
+  }
+  select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
 }
 
-recognition.onspeechend = function() {
-  instructions.text('You were quiet for a while so voice recognition turned itself off.');
-}
+var create_email = false;
+var final_transcript = '';
+var recognizing = false;
+var ignore_onend;
+var start_timestamp;
+if (!('webkitSpeechRecognition' in window)) {
+  upgrade();
+} else {
+  start_button.style.display = 'inline-block';
+  var recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
 
-recognition.onerror = function(event) {
-  if(event.error == 'no-speech') {
-    instructions.text('No speech was detected. Try again.');  
+  recognition.onstart = function () {
+    recognizing = true;
+    showInfo('info_speak_now');
+    start_img.src = 'mic-animate.gif';
+  };
+
+  recognition.onerror = function (event) {
+    if (event.error == 'no-speech') {
+      start_img.src = 'mic.gif';
+      showInfo('info_no_speech');
+      ignore_onend = true;
+    }
+    if (event.error == 'audio-capture') {
+      start_img.src = 'mic.gif';
+      showInfo('info_no_microphone');
+      ignore_onend = true;
+    }
+    if (event.error == 'not-allowed') {
+      if (event.timeStamp - start_timestamp < 100) {
+        showInfo('info_blocked');
+      } else {
+        showInfo('info_denied');
+      }
+      ignore_onend = true;
+    }
+  };
+
+  recognition.onend = function () {
+    recognizing = false;
+    if (ignore_onend) {
+      return;
+    }
+    start_img.src = 'mic.gif';
+    if (!final_transcript) {
+      showInfo('info_start');
+      return;
+    }
+    showInfo('');
+    if (window.getSelection) {
+      window.getSelection().removeAllRanges();
+      var range = document.createRange();
+      //range.selectNode(document.getElementById('final_span'));
+      window.getSelection().addRange(range);
+    }
+    if (create_email) {
+      create_email = false;
+      createEmail();
+    }
+  };
+
+  recognition.onresult = function (event) {
+    var interim_transcript = '';
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        final_transcript += event.results[i][0].transcript;
+      } else {
+        interim_transcript += event.results[i][0].transcript;
+      }
+    }
+    final_transcript = capitalize(final_transcript);
+     console.log(linebreak(final_transcript));
+    console.log(linebreak(interim_transcript));  
+    if (final_transcript || interim_transcript) {
+      showButtons('inline-block');
+    }
   };
 }
 
+function upgrade() {
+  start_button.style.visibility = 'hidden';
+  showInfo('info_upgrade');
+}
+
+var two_line = /\n\n/g;
+var one_line = /\n/g;
+function linebreak(s) {
+  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+}
+
+var first_char = /\S/;
+function capitalize(s) {
+  return s.replace(first_char, function (m) { return m.toUpperCase(); });
+}
 
 
-/*-----------------------------
-      App buttons and input 
-------------------------------*/
 
-$('#start-record-btn').on('click', function(e) {
-  if (noteContent.length) {
-    noteContent += ' ';
+
+function startButton(event) {
+  if (recognizing) {
+    recognition.stop();
+    return;
   }
+  final_transcript = '';
+  recognition.lang = select_dialect.value;
   recognition.start();
-});
-
-
-$('#pause-record-btn').on('click', function(e) {
-  recognition.stop();
-  instructions.text('Voice recognition paused.');
-});
-
-// Sync the text inside the text area with the noteContent variable.
-noteTextarea.on('input', function() {
-  noteContent = $(this).val();
-})
-
-$('#save-note-btn').on('click', function(e) {
-  recognition.stop();
-
-  if(!noteContent.length) {
-    instructions.text('Could not save empty note. Please add a message to your note.');
-  }
-  else {
-    // Save note to localStorage.
-    // The key is the dateTime with seconds, the value is the content of the note.
-    saveNote(new Date().toLocaleString(), noteContent);
-
-    // Reset variables and update UI.
-    noteContent = '';
-    renderNotes(getAllNotes());
-    noteTextarea.val('');
-    instructions.text('Note saved successfully.');
-  }
-      
-})
-
-
-notesList.on('click', function(e) {
-  e.preventDefault();
-  var target = $(e.target);
-
-  // Listen to the selected note.
-  if(target.hasClass('listen-note')) {
-    var content = target.closest('.note').find('.content').text();
-    readOutLoud(content);
-  }
-
-  // Delete note.
-  if(target.hasClass('delete-note')) {
-    var dateTime = target.siblings('.date').text();  
-    deleteNote(dateTime);
-    target.closest('.note').remove();
-  }
-});
-
-
-
-/*-----------------------------
-      Speech Synthesis 
-------------------------------*/
-
-function readOutLoud(message) {
-	var speech = new SpeechSynthesisUtterance();
-
-  // Set the text and voice attributes.
-	speech.text = message;
-	speech.volume = 1;
-	speech.rate = 1;
-	speech.pitch = 1;
-  
-	window.speechSynthesis.speak(speech);
+  ignore_onend = false;
+ // final_span.innerHTML = '';
+ // interim_span.innerHTML = '';
+  start_img.src = 'mic-slash.gif';
+  showInfo('info_allow');
+  showButtons('none');
+  start_timestamp = event.timeStamp;
 }
 
-
-
-/*-----------------------------
-      Helper Functions 
-------------------------------*/
-
-function renderNotes(notes) {
-  var html = '';
-  if(notes.length) {
-    notes.forEach(function(note) {
-      html+= `<li class="note">
-        <p class="header">
-          <span class="date">${note.date}</span>
-          <a href="#" class="listen-note" title="Listen to Note">Listen to Note</a>
-          <a href="#" class="delete-note" title="Delete">Delete</a>
-        </p>
-        <p class="content">${note.content}</p>
-      </li>`;    
-    });
+function showInfo(s) {
+  if (s) {
+    for (var child = info.firstChild; child; child = child.nextSibling) {
+      if (child.style) {
+        child.style.display = child.id == s ? 'inline' : 'none';
+      }
+    }
+    info.style.visibility = 'visible';
+  } else {
+    info.style.visibility = 'hidden';
   }
-  else {
-    html = '<li><p class="content">You don\'t have any notes yet.</p></li>';
+}
+
+var current_style;
+function showButtons(style) {
+  if (style == current_style) {
+    return;
   }
-  notesList.html(html);
+  current_style = style;
+ // copy_button.style.display = style;
+ // email_button.style.display = style;
+ // copy_info.style.display = 'none';
+  //email_info.style.display = 'none';
 }
-
-
-function saveNote(dateTime, content) {
-  localStorage.setItem('note-' + dateTime, content);
-}
-
-
-function getAllNotes() {
-  var notes = [];
-  var key;
-  for (var i = 0; i < localStorage.length; i++) {
-    key = localStorage.key(i);
-
-    if(key.substring(0,5) == 'note-') {
-      notes.push({
-        date: key.replace('note-',''),
-        content: localStorage.getItem(localStorage.key(i))
-      });
-    } 
-  }
-  return notes;
-}
-
-
-function deleteNote(dateTime) {
-  localStorage.removeItem('note-' + dateTime); 
-}
-
