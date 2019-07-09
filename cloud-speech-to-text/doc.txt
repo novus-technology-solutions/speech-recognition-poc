@@ -1,0 +1,6 @@
+https://medium.com/kmakes/how-i-made-an-app-to-recognize-speech-c65c4be666fa
+
+https://cloud.google.com/speech-to-text/docs/streaming-recognize#speech-streaming-recognize-nodejs
+
+https://www.woolha.com/tutorials/node-js-google-speech-to-text-recognition-api-examples
+
