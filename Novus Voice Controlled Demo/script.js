@@ -77,12 +77,47 @@ if (!('webkitSpeechRecognition' in window)) {
         interim_transcript += event.results[i][0].transcript;
       }
     }
-    final_transcript = capitalize(final_transcript);
-     console.log(linebreak(final_transcript));
-    console.log(linebreak(interim_transcript));  
+    //final_transcript = capitalize(final_transcript);
+    //console.log(linebreak(final_transcript));  
+   // console.log(linebreak(interim_transcript));  
     if (final_transcript || interim_transcript) {
       showButtons('inline-block');
+      
+     
+        let final = final_transcript.split(" ");
+        let finalslice = final.slice(final.length - 4, final.length);
+      
+     // console.log(finalslice);
+      if (finalslice[0] == "graphic" || final[0] == "Graphic") {
+       // console.log(finalslice[2], finalslice[3]); 
+        
+        switch (finalslice[2]) {
+          case 1: case "1":
+          case "one":
+            $("#block1").css("background-color", finalslice[3]);
+            break;
+          
+          case 2: case "2":
+          case "two": case "to":
+            $("#block2").css("background-color", finalslice[3]);
+            break;
+
+          case 3: case "3":
+          case "three":
+            $("#block3").css("background-color", finalslice[3]);
+            break;
+            
+          case 4: case "4":
+          case "four": case "for":
+            $("#block4").css("background-color", finalslice[3]);
+            break;
+        }
+      }
     }
+
+   
+    
+
   };
 }
 
