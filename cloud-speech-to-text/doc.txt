@@ -4,3 +4,5 @@ https://cloud.google.com/speech-to-text/docs/streaming-recognize#speech-streamin
 
 https://www.woolha.com/tutorials/node-js-google-speech-to-text-recognition-api-examples
 
+https://github.com/saebekassebil/microphone-stream/issues/15  (Good to know)
+
