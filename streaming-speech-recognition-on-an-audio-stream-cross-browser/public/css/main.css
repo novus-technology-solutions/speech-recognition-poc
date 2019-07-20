@@ -107,6 +107,35 @@ h1 {
     color: black;
 }
 
+/**********************************************/
+
+.enjoy-css {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    float: left;
+    width: 440px;
+    height: 258px;
+    padding: 20px;
+    margin-left: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+    border: none;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    font: normal 16px/1 "Times New Roman", Times, serif;
+    color: rgba(255, 255, 255, 1);
+    text-align: center;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    background: #0199d9;
+    -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+
+
 
 /* ==========================================================================
    Media Queries

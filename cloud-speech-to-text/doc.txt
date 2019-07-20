@@ -6,3 +6,7 @@ https://www.woolha.com/tutorials/node-js-google-speech-to-text-recognition-api-e
 
 https://github.com/saebekassebil/microphone-stream/issues/15  (Good to know)
 
+https://github.com/vin-ni/Google-Cloud-Speech-Node-Socket-Playground
+
+
+
