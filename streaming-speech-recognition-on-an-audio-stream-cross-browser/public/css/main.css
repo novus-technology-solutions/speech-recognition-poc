@@ -1,6 +1,6 @@
 body {
     font-family: sans-serif;
-    background-color: rgb(189, 189, 189);
+    
 }
 
 p {
@@ -109,6 +109,17 @@ h1 {
 
 /**********************************************/
 
+.right {
+    float: right;
+}
+
+.container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 20px;
+    text-align: left;
+}
+
 .enjoy-css {
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
@@ -118,7 +129,7 @@ h1 {
     height: 258px;
     padding: 20px;
     margin-left: 10px;
-    margin-top: 10px;
+    margin-top: 5px;
     overflow: hidden;
     border: none;
     -webkit-border-radius: 8px;

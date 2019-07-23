@@ -76,6 +76,7 @@ function microphoneProcess(e) {
 var startButton = document.getElementById("startRecButton");
 startButton.addEventListener("click", startRecording);
 
+
 var endButton = document.getElementById("stopRecButton");
 endButton.addEventListener("click", stopRecording);
 endButton.disabled = true;
@@ -129,6 +130,7 @@ function stopRecording() {
 //================= SOCKET IO =================
 socket.on('connect', function (data) {
 	socket.emit('join', 'Server Connected to Client');
+
 });
 
 
@@ -184,6 +186,7 @@ socket.on('speechData', function (data) {
 		endButton.disabled = false;
 
 		removeLastSentence = false;
+		console.log(resultText.innerText); //Fode
 	}
 });
 
