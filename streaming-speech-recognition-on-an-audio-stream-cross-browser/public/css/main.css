@@ -113,6 +113,22 @@ h1 {
     float: right;
 }
 
+.bloc1 {
+    background-image: url("/assets/images/block1.jpg");
+}
+
+.bloc2 {
+    background-image: url("/assets/images/block2.jpg");
+}
+
+.bloc3 {
+    background-image: url("/assets/images/block3.jpg");
+}
+
+.bloc4 {
+    background-image: url("/assets/images/block4.jpg");
+}
+
 .container {
     max-width: 980px;
     margin: 0 auto;
@@ -139,7 +155,7 @@ h1 {
     text-align: center;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    background: #0199d9;
+   /* background: #0199d9;*/
     -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.3);
     box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.3);
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
