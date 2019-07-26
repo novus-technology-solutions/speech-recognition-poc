@@ -30,11 +30,16 @@ const recognizeStream = client
     .on('data', (data) =>{
        
     if(data.results[0].isFinal){
-    process.stdout.write(
+    const loopTampon= ((data.results[0].alternatives[0].transcript).trim()).split(" "); 
+    console.log(loopTampon);
+    if(loopTampon[0]=="Novus"){
+      process.stdout.write(
             data.results[0] && data.results[0].alternatives[0] ?
             `Transcription: ${data.results[0].alternatives[0].transcript}\n` :
             `\n\nReached transcription time limit, press Ctrl+C\n`
-        )
+        );
+    } 
+    
        }
         
         }
