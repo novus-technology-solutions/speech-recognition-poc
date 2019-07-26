@@ -8,5 +8,10 @@ https://github.com/saebekassebil/microphone-stream/issues/15  (Good to know)
 
 https://github.com/vin-ni/Google-Cloud-Speech-Node-Socket-Playground
 
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\deret\Documents\GitHub\speech-recognition-poc\cloud-speech-to-text\Novus test-4b12ee7501c7.json"
+
+
+
+
 
 
